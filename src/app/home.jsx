@@ -14,8 +14,10 @@ function Home({ session }) {
   const [value] = useDebounce(search, 1000);
 
   const [dataMusic, setDataMusic] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const FetchSearch = async (value) => {
+    setLoading(true);
     const response = await SearchAPI.getAll({
       params: {
         q: value || "pamungkas",
@@ -23,7 +25,7 @@ function Home({ session }) {
         limit: 10,
       },
     });
-    console.log(response);
+    setLoading(false);
     setDataMusic(response?.data?.artists);
   };
 
@@ -53,7 +55,6 @@ function Home({ session }) {
   };
 
   return (
-
     <div className="p-12">
       <div>
         <Input placeholder="Cari" onChange={(e) => setSearch(e.target.value)} />
@@ -68,6 +69,7 @@ function Home({ session }) {
       )}
 
       <div className="h-[520px] overflow-auto mt-12">
+        {loading && (<div className="w-screen flex justify-center items-center h-screen top-0 right-0 fixed bg-black/10"><div className="loader flex items-center"></div></div>)}
         {dataMusic?.items?.map((item, index) => {
           return (
             <div key={index}>
@@ -83,18 +85,17 @@ function Home({ session }) {
         })}
       </div>
 
-
       {uri && (
         <div className="fixed bottom-4 left-4">
-          <div className="absolute right-0 top-[-20px]" onClick={() => {setUri('')}}>
-          <CloseIcon/>
+          <div
+            className="absolute right-0 top-[-20px]"
+            onClick={() => {
+              setUri("");
+            }}
+          >
+            <CloseIcon />
           </div>
-          <SpotifyPlayer
-            uri={uri}
-            size={size}
-            view={view}
-            theme={theme}
-          />
+          <SpotifyPlayer uri={uri} size={size} view={view} theme={theme} />
         </div>
       )}
     </div>
